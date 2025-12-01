@@ -415,3 +415,226 @@ if (stepBackBtn) {
         }
     });
 }
+
+function addLogEntry(message) {
+    const log = document.getElementById('execution-log');
+    const entry = document.createElement('p');
+    // FIXED: use template literal with backticks
+    entry.textContent = `Step ${currentStep + 1}: ${message}`;
+    entry.classList.add('highlight');
+    log.appendChild(entry);
+    log.scrollTop = log.scrollHeight;
+}
+
+// Code Editor and Playground
+const editor = document.getElementById('code-editor');
+const codeOutput = document.getElementById('code-output');
+const runButton = document.getElementById('run-code');
+const resetButton = document.getElementById('reset-code');
+
+// Initialize code editor with default content
+const defaultCode = `#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main() {
+    // Example: Open and read a file
+    int fd = open("example.txt", O_RDONLY);
+    if (fd == -1) {
+        perror("Error opening file");
+        return 1;
+    }
+    
+    char buffer[1024];
+    ssize_t bytes_read = read(fd, buffer, sizeof(buffer));
+    if (bytes_read == -1) {
+        perror("Error reading file");
+        close(fd);
+        return 1;
+    }
+    
+    printf("Read %zd bytes from file\\n", bytes_read);
+    close(fd);
+    return 0;
+}`;
+
+if (editor) {
+    editor.textContent = defaultCode;
+}
+
+// Syntax highlighting function
+function highlightSyntax(code) {
+    const keywords = ['int', 'char', 'if', 'else', 'return', 'main', 'include'];
+    const types = ['ssize_t', 'size_t'];
+    const functions = ['open', 'read', 'write', 'close', 'printf', 'perror'];
+
+    let highlighted = code
+        .replace(/(\/\/.*$)/gm, '<span class="comment">$1</span>')
+        .replace(/(#include.*$)/gm, '<span class="preprocessor">$1</span>')
+        // FIXED: proper RegExp construction using strings
+        .replace(new RegExp(`\\b(${keywords.join('|')})\\b`, 'g'), '<span class="keyword">$1</span>')
+        .replace(new RegExp(`\\b(${types.join('|')})\\b`, 'g'), '<span class="type">$1</span>')
+        .replace(new RegExp(`\\b(${functions.join('|')})\\b`, 'g'), '<span class="function">$1</span>')
+        .replace(/(["'].*?["'])/g, '<span class="string">$1</span>');
+
+    return highlighted;
+}
+
+// Update syntax highlighting when code changes
+if (editor) {
+    editor.addEventListener('input', () => {
+        const plain = editor.textContent;
+        editor.innerHTML = highlightSyntax(plain);
+    });
+}
+
+// Run code button handler
+if (runButton) {
+    runButton.addEventListener('click', () => {
+        const code = editor ? editor.textContent : '';
+        codeOutput.innerHTML = 'Running system calls...<br>';
+
+        // Simulate system call execution
+        setTimeout(() => {
+            codeOutput.innerHTML += 'System call: open()<br>';
+            animateLine('line1');
+
+            setTimeout(() => {
+                codeOutput.innerHTML += 'System call: read()<br>';
+                animateLine('line2');
+
+                setTimeout(() => {
+                    codeOutput.innerHTML += 'System call: close()<br>';
+                    animateLine('line3');
+
+                    setTimeout(() => {
+                        codeOutput.innerHTML += '<br>Execution completed successfully!';
+                    }, 1000);
+                }, 1000);
+            }, 1000);
+        }, 1000);
+    });
+}
+
+// Reset code button handler
+if (resetButton && editor) {
+    resetButton.addEventListener('click', () => {
+        editor.textContent = defaultCode;
+        editor.innerHTML = highlightSyntax(defaultCode);
+        codeOutput.innerHTML = '';
+        resetLines();
+    });
+}
+
+// Visual diagram animation
+function animateLine(lineId) {
+    const line = document.getElementById(lineId);
+    if (line) {
+        line.classList.add('active');
+    }
+}
+
+function resetLines() {
+    document.querySelectorAll('.line').forEach(line => {
+        line.classList.remove('active');
+        line.style.width = '0';
+    });
+}
+
+// Challenges functionality
+document.querySelectorAll('.start-challenge').forEach(button => {
+    button.addEventListener('click', function() {
+        const challenge = this.closest('.challenge-card');
+        const title = challenge.querySelector('h3').textContent;
+
+        // Update editor with challenge template
+        let template = '';
+        switch(title) {
+            case 'File Operations':
+                template = `#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main() {
+    // TODO: Implement file operations
+    // 1. Open a file
+    // 2. Read from the file
+    // 3. Write to the file
+    // 4. Close the file
+    
+    return 0;
+}`;
+                break;
+            case 'Process Management':
+                template = `#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main() {
+    // TODO: Implement process management
+    // 1. Create a child process
+    // 2. Handle parent and child execution
+    // 3. Wait for child process
+    
+    return 0;
+}`;
+                break;
+            case 'Network Communication':
+                template = `#include <stdio.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+int main() {
+    // TODO: Implement network communication
+    // 1. Create a socket
+    // 2. Bind to an address
+    // 3. Listen for connections
+    // 4. Accept connections
+    
+    return 0;
+}`;
+                break;
+        }
+
+        if (editor) {
+            editor.textContent = template;
+            editor.innerHTML = highlightSyntax(template);
+        }
+        if (codeOutput) codeOutput.innerHTML = '';
+        resetLines();
+
+        // Scroll to playground section
+        const playground = document.getElementById('playground');
+        if (playground) {
+            playground.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+});
+
+// Update the system call selector in HTML
+document.addEventListener('DOMContentLoaded', () => {
+    const select = document.getElementById('syscall-select');
+    if (!select) return;
+
+    Object.keys(syscallData).forEach(syscall => {
+        const option = document.createElement('option');
+        option.value = syscall;
+        // FIXED: proper template literal
+        option.textContent = `${syscall}() - ${getSyscallDescription(syscall)}`;
+        select.appendChild(option);
+    });
+});
+
+function getSyscallDescription(syscall) {
+    const descriptions = {
+        open: "Open a file",
+        read: "Read from a file",
+        write: "Write to a file",
+        fork: "Create a new process",
+        exec: "Execute a program",
+        socket: "Create a network socket"
+    };
+    return descriptions[syscall] || "Unknown system call";
+}

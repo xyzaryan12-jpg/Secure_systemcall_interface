@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure System Call Interface</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">SecureSysCalls</div>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#security">Security</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>User-Friendly Secure System Call Interface</h1>
+            <p>Learn about secure system calls and best practices for system-level programming</p>
+            <a href="#features" class="cta-button">Explore Features</a>
+            
+        </div>
+    </section>
+
+    <section id="about" class="about">
+        <h2>About System Calls</h2>
+        <div class="about-content">
+            <div class="about-card">
+                <i class="fas fa-shield-alt"></i>
+                <h3>What are System Calls?</h3>
+                <p>System calls are the fundamental interface between user applications and the operating system kernel. They provide secure access to system resources and services.</p>
+            </div>
+            <div class="about-card">
+                <i class="fas fa-lock"></i>
+                <h3>Security Importance</h3>
+                <p>Proper implementation of system calls is crucial for maintaining system security and preventing unauthorized access to sensitive resources.</p>
+            </div>
+            <div class="about-card">
+                <i class="fas fa-code"></i>
+                <h3>Best Practices</h3>
+                <p>Learn about secure coding practices, input validation, and proper error handling when working with system calls.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="interactive" class="interactive">
+        <h2>Interactive System Call Explorer</h2>
+        <div class="interactive-container">
+            <div class="system-call-selector">
+                <h3>Select a System Call</h3>
+                <select id="syscall-select">
+                    <option value="">Choose a system call...</option>
+                    <option value="open">open() - Open a file</option>
+                    <option value="read">read() - Read from a file</option>
+                    <option value="write">write() - Write to a file</option>
+                    <option value="fork">fork() - Create a new process</option>
+                    <option value="exec">exec() - Execute a program</option>
+                    <option value="socket">socket() - Create a network socket</option>
+                </select>
+                <button id="run-syscall" class="run-button">Run System Call</button>
+            </div>
+
+            <div class="visualization-container">
+                <div class="visualization-header">
+                    <h3>System Call Execution Flow</h3>
+                    <div class="controls">
+                        <button id="step-back" class="control-button" disabled>Previous Step</button>
+                        <button id="step-forward" class="control-button" disabled>Next Step</button>
+                    </div>
+                </div>
+                <div class="visualization-area">
+                    <div class="user-space">
+                        <h4>User Space</h4>
+                        <div class="code-display" id="user-code"></div>
+                    </div>
+                    <div class="kernel-space">
+                        <h4>Kernel Space</h4>
+                        <div class="code-display" id="kernel-code"></div>
+                    </div>
+                </div>
+                <div class="execution-log" id="execution-log"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="process" class="process">
+        <h2>How System Calls Work</h2>
+        <div class="process-container">
+            <div class="process-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>User Application Request</h3>
+                    <p>The process begins when a user application needs to perform a privileged operation (like file I/O, process creation, or network communication).</p>
+                    <div class="code-example">
+                        <pre><code>// Example: Opening a file
+int fd = open("example.txt", O_RDONLY);</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>System Call Interface</h3>
+                    <p>The application makes a system call through the system call interface, which acts as a bridge between user space and kernel space.</p>
+                    <div class="code-example">
+                        <pre><code>// System call interface
+SYSCALL_DEFINE2(open, const char __user *, filename, int, flags)
+{
+    return do_sys_open(AT_FDCWD, filename, flags, 0);
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Context Switch</h3>
+                    <p>The processor switches from user mode to kernel mode, saving the current process state and loading the kernel's context.</p>
+                    <div class="process-diagram">
+                        <div class="mode-switch">
+                            <div class="user-mode">User Mode</div>
+                            <div class="switch-arrow">→</div>
+                            <div class="kernel-mode">Kernel Mode</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Kernel Processing</h3>
+                    <p>The kernel performs the requested operation, handling security checks, resource allocation, and actual task execution.</p>
+                    <div class="code-example">
+                        <pre><code>// Kernel processing
+static long do_sys_open(int dfd, const char __user *filename, int flags, umode_t mode)
+{
+    // Security checks
+    // Resource allocation
+    // Task execution
+    return fd;
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <h3>Return to User Space</h3>
+                    <p>After completion, the kernel returns the result to user space, and the processor switches back to user mode.</p>
+                    <div class="process-diagram">
+                        <div class="mode-switch">
+                            <div class="kernel-mode">Kernel Mode</div>
+                            <div class="switch-arrow">→</div>
+                            <div class="user-mode">User Mode</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <h2>Key Features</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3>Input Validation</h3>
+                <p>Proper validation of user input to prevent buffer overflows and injection attacks.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Access Control</h3>
+                <p>Implementation of proper permission checks and access control mechanisms.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Error Handling</h3>
+                <p>Robust error handling to prevent information leakage and system crashes.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Resource Management</h3>
+                <p>Efficient management of system resources to prevent resource exhaustion.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="security" class="security">
+        <h2>Security Guidelines</h2>
+        <div class="security-content">
+            <div class="security-item">
+                <h3>1. Principle of Least Privilege</h3>
+                <p>Always use the minimum required privileges for system operations.</p>
+            </div>
+            <div class="security-item">
+                <h3>2. Input Sanitization</h3>
+                <p>Validate and sanitize all user inputs before processing.</p>
+            </div>
+            <div class="security-item">
+                <h3>3. Secure Communication</h3>
+                <p>Use secure channels for inter-process communication.</p>
+            </div>
+            <div class="security-item">
+                <h3>4. Regular Updates</h3>
+                <p>Keep system libraries and dependencies up to date.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <h2>Contact Us</h2>
+        <form class="contact-form">
+            <input type="text" placeholder="Name" required>
+            <input type="email" placeholder="Email" required>
+            <textarea placeholder="Message" required></textarea>
+            <button type="submit" class="submit-button">Send Message</button>
+        </form>
+    </section>
+
+    <section id="playground" class="playground">
+        <h2>System Call Playground</h2>
+        <div class="playground-container">
+            <div class="code-editor-container">
+                <div class="editor-header">
+                    <h3>Write Your Own System Call</h3>
+                    <div class="editor-controls">
+                        <button id="run-code" class="run-button">Run Code</button>
+                        <button id="reset-code" class="reset-button">Reset</button>
+                    </div>
+                </div>
+                <div class="code-editor" id="code-editor"></div>
+                <div class="output-container">
+                    <h4>Output</h4>
+                    <div id="code-output"></div>
+                </div>
+            </div>
+
+            <div class="visual-diagram">
+                <h3>System Call Flow Diagram</h3>
+                <div class="diagram-container">
+                    <div class="diagram-space">
+                        <div class="user-space-diagram">
+                            <div class="process-box" id="user-process">
+                                <span>User Process</span>
+                            </div>
+                            <div class="code-box" id="user-code-box">
+                                <pre>Your Code Here</pre>
+                            </div>
+                        </div>
+                        <div class="kernel-space-diagram">
+                            <div class="process-box" id="kernel-process">
+                                <span>Kernel</span>
+                            </div>
+                            <div class="code-box" id="kernel-code-box">
+                                <pre>System Call Handler</pre>
+                            </div>
+                        </div>
+                        <div class="connection-lines">
+                            <div class="line" id="line1"></div>
+                            <div class="line" id="line2"></div>
+                            <div class="line" id="line3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="challenges" class="challenges">
+        <h2>System Call Challenges</h2>
+        <div class="challenges-container">
+            <div class="challenge-card">
+                <h3>File Operations</h3>
+                <p>Create a program that safely opens, reads, and writes to a file using system calls.</p>
+                <div class="challenge-difficulty">
+                    <span class="difficulty-label">Difficulty:</span>
+                    <div class="difficulty-stars">★★★☆☆</div>
+                </div>
+                <button class="start-challenge">Start Challenge</button>
+            </div>
+            <div class="challenge-card">
+                <h3>Process Management</h3>
+                <p>Implement a simple process manager using fork() and exec() system calls.</p>
+                <div class="challenge-difficulty">
+                    <span class="difficulty-label">Difficulty:</span>
+                    <div class="difficulty-stars">★★★★☆</div>
+                </div>
+                <button class="start-challenge">Start Challenge</button>
+            </div>
+            <div class="challenge-card">
+                <h3>Network Communication</h3>
+                <p>Build a basic client-server application using socket system calls.</p>
+                <div class="challenge-difficulty">
+                    <span class="difficulty-label">Difficulty:</span>
+                    <div class="difficulty-stars">★★★★★</div>
+                </div>
+                <button class="start-challenge">Start Challenge</button>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Secure System Call Interface. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

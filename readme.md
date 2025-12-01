@@ -3,10 +3,6 @@
 A modern, interactive web-based platform designed to help users understand system calls, kernel interactions, and secure OS-level programming.
 This project includes visualizations, flow diagrams, a system call explorer, a code playground, and challenges to provide a complete learning experience.
 
-🚀 Live Demo
-
-(Add link here when deployed)
-https://your-deployment-link.com
 
 📂 Project Structure
 Secure-System-Calls/
